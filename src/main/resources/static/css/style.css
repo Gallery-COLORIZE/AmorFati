@@ -1,0 +1,161 @@
+/* ==========================================================================
+   AmorFati (아모르파티) 🌿 - Main & Responsive Theme Stylesheet
+   ========================================================================== */
+
+/* 1. Pretendard Web Font */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+/* 2. Global Reset, Typography & Mobile Optimization */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    letter-spacing: -0.015em;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+/* 한국어 단어 단위 줄바꿈 보정 */
+.break-keep {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+/* 모바일 가로 스크롤바 숨기기 */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ==========================================================================
+   3. 4가지 웜 테마 변수 (Warm & Cozy Color Systems)
+   ========================================================================== */
+
+/* ☀️ 1) 포근한 오트밀 (기본: 깨끗하고 따뜻한 크림 & 오트밀 톤) */
+[data-theme="amorfati-oatmeal"] {
+    --bg-canvas: #F8F5EE;
+    --bg-card: #FFFFFF;
+    --bg-sub: #EFE9DC;
+    --border-color: #E2DACB;
+    --text-main: #2C2621;
+    --text-muted: #7A7065;
+    --primary-accent: #C86746;
+    --primary-accent-hover: #B05537;
+    --primary-text: #FFFFFF;
+    --chip-bg: #EAE3D4;
+}
+
+/* 🌾 2) 따뜻한 린넨 (확연히 깊고 아늑한 카페 라떼/베이지 톤) */
+[data-theme="amorfati-linen"] {
+    --bg-canvas: #E8DDCC;
+    --bg-card: #FAF6EF;
+    --bg-sub: #DCCFBB;
+    --border-color: #CBBCA4;
+    --text-main: #33261C;
+    --text-muted: #6E5A4B;
+    --primary-accent: #9E5034;
+    --primary-accent-hover: #833F26;
+    --primary-text: #FFFFFF;
+    --chip-bg: #D8C8B0;
+}
+
+/* 🌿 3) 차분한 세이지 (눈이 가장 편안한 힐링 숲속 미스트 톤) */
+[data-theme="amorfati-sage"] {
+    --bg-canvas: #E8F0EC;
+    --bg-card: #FFFFFF;
+    --bg-sub: #D7E5DC;
+    --border-color: #C2D5C9;
+    --text-main: #1D2C24;
+    --text-muted: #516D5E;
+    --primary-accent: #3E6B53;
+    --primary-accent-hover: #2F5440;
+    --primary-text: #FFFFFF;
+    --chip-bg: #D2E3D8;
+}
+
+/* 🌆 4) 은은한 노을 (어둡지 않고 선명한 웜 그레이지) */
+[data-theme="amorfati-dusk"] {
+    --bg-canvas: #DCD5C9;
+    --bg-card: #F4EFE6;
+    --bg-sub: #CAC0B0;
+    --border-color: #B9AD9A;
+    --text-main: #27211B;
+    --text-muted: #65584C;
+    --primary-accent: #B85838;
+    --primary-accent-hover: #9B4529;
+    --primary-text: #FFFFFF;
+    --chip-bg: #C5B9A6;
+}
+
+/* ==========================================================================
+   4. 테마 클래스 유틸리티 매핑
+   ========================================================================== */
+
+.theme-body {
+    background-color: var(--bg-canvas);
+    color: var(--text-main);
+}
+
+.theme-card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-main);
+}
+
+.theme-sub {
+    background-color: var(--bg-sub);
+    border-color: var(--border-color);
+}
+
+.theme-border {
+    border-color: var(--border-color);
+}
+
+.theme-text-main {
+    color: var(--text-main);
+}
+
+.theme-text-muted {
+    color: var(--text-muted);
+}
+
+.theme-primary-bg {
+    background-color: var(--primary-accent);
+    color: var(--primary-text);
+}
+
+.theme-primary-bg:hover {
+    background-color: var(--primary-accent-hover);
+}
+
+.theme-primary-text {
+    color: var(--primary-accent);
+}
+
+/* ==========================================================================
+   5. 온기 무드 애니메이션
+   ========================================================================== */
+
+@keyframes soft-warmth {
+    0%, 100% { 
+        opacity: 0.35; 
+        transform: scale(1); 
+    }
+    50% { 
+        opacity: 0.65; 
+        transform: scale(1.03); 
+    }
+}
+
+.animate-soft-warmth {
+    animation: soft-warmth 8s ease-in-out infinite;
+}

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="amorfati-oatmeal" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AmorFati 🌿 | 네 운명을 사랑하라</title>
+
+    <!-- 즉시 테마 적용 (깜빡임 방지) - 기본값: 포근한 오트밀(amorfati-oatmeal) -->
+    <script>
+        const savedTheme = localStorage.getItem('amorfati_theme') || 'amorfati-oatmeal';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <!-- 1. Tailwind CSS + DaisyUI (CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 2. Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 3. Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+    <!-- 4. AmorFati 분리된 CSS 스타일시트 -->
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css" />
+</head>
+<body class="min-h-screen theme-body flex flex-col items-center justify-start antialiased relative overflow-x-hidden transition-colors duration-300"
+      x-data="heroApp()">
+
+    <!-- 🌟 부드러운 웜 앰버 배경 무드 조명 -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[420px] sm:h-[520px] bg-gradient-to-b from-amber-500/15 via-orange-500/5 to-transparent blur-2xl sm:blur-3xl -z-10 pointer-events-none rounded-full animate-soft-warmth"></div>
+
+    <!-- 1. 상단 글로벌 헤더 (모바일 가로 스크롤 & 줄바꿈 방지) -->
+    <header class="w-full max-w-4xl px-3.5 sm:px-6 py-3.5 sm:py-5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 sm:gap-4 border-b theme-border">
+        <!-- 로고 -->
+        <a href="/" class="flex items-center gap-2 group flex-shrink-0">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl theme-primary-bg flex items-center justify-center group-hover:scale-105 transition-all shadow-sm">
+                <i data-lucide="leaf" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            </div>
+            <div>
+                <span class="text-lg sm:text-xl font-bold tracking-tight theme-text-main group-hover:opacity-80 transition-opacity">AmorFati</span>
+                <span class="hidden md:inline-block ml-1.5 text-xs theme-text-muted font-normal">🌿 네 운명을 사랑하라</span>
+            </div>
+        </a>
+
+        <!-- 테마 선택 바 (모바일 터치 친화적 스크롤 지원) -->
+        <div class="flex items-center gap-2 max-w-full overflow-x-auto no-scrollbar">
+            <div class="join border theme-border rounded-xl sm:rounded-2xl theme-sub shadow-sm p-0.5 flex-nowrap flex-shrink-0">
+                <button type="button"
+                        class="btn btn-xs sm:btn-sm rounded-lg sm:rounded-xl border-none transition-all px-2 sm:px-3 text-[11px] sm:text-xs h-7 sm:h-8"
+                        :class="currentTheme === 'amorfati-oatmeal' ? 'theme-primary-bg font-bold shadow-sm' : 'btn-ghost theme-text-muted hover:bg-white/40'"
+                        @click="setTheme('amorfati-oatmeal')">
+                    <span>☀️ 오트밀</span>
+                </button>
+                <button type="button"
+                        class="btn btn-xs sm:btn-sm rounded-lg sm:rounded-xl border-none transition-all px-2 sm:px-3 text-[11px] sm:text-xs h-7 sm:h-8"
+                        :class="currentTheme === 'amorfati-linen' ? 'theme-primary-bg font-bold shadow-sm' : 'btn-ghost theme-text-muted hover:bg-white/40'"
+                        @click="setTheme('amorfati-linen')">
+                    <span>🌾 린넨</span>
+                </button>
+                <button type="button"
+                        class="btn btn-xs sm:btn-sm rounded-lg sm:rounded-xl border-none transition-all px-2 sm:px-3 text-[11px] sm:text-xs h-7 sm:h-8"
+                        :class="currentTheme === 'amorfati-sage' ? 'theme-primary-bg font-bold shadow-sm' : 'btn-ghost theme-text-muted hover:bg-white/40'"
+                        @click="setTheme('amorfati-sage')">
+                    <span>🌿 세이지</span>
+                </button>
+                <button type="button"
+                        class="btn btn-xs sm:btn-sm rounded-lg sm:rounded-xl border-none transition-all px-2 sm:px-3 text-[11px] sm:text-xs h-7 sm:h-8"
+                        :class="currentTheme === 'amorfati-dusk' ? 'theme-primary-bg font-bold shadow-sm' : 'btn-ghost theme-text-muted hover:bg-white/40'"
+                        @click="setTheme('amorfati-dusk')">
+                    <span>🌆 노을</span>
+                </button>
+            </div>
+
+            <!-- 날짜 (태블릿/데스크탑) -->
+            <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full theme-card border theme-border text-xs theme-text-main shadow-sm flex-shrink-0">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 theme-primary-text"></i>
+                <span th:text="${todayFormatted} ?: '2026년 8월 28일 (금)'">2026년 8월 28일 (금)</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. 메인 컨텐츠 영역 (모바일 여백 & 패딩 최적화) -->
+    <main class="w-full max-w-4xl px-3 sm:px-5 md:px-6 py-6 sm:py-12 md:py-16 space-y-12 sm:space-y-20">
+
+        <!-- [HERO SECTION] 모바일 단어 끊김 없는 따뜻한 메시지 -->
+        <section class="text-center space-y-4 sm:space-y-6 max-w-2xl mx-auto pt-1 sm:pt-4">
+            
+            <!-- 뱃지 -->
+            <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full theme-card border theme-border text-[11px] sm:text-xs theme-text-main shadow-sm break-keep">
+                <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full theme-primary-bg animate-pulse flex-shrink-0"></span>
+                <span>어떠한 평가도 없는 나만의 안전한 감정 쉼터</span>
+            </div>
+
+            <!-- 메인 카피 (break-keep 적용) -->
+            <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-snug sm:leading-tight theme-text-main break-keep">
+                세상의 기준에 나를 맞추려<br/>
+                <span class="theme-primary-text">애쓰지 않아도 괜찮습니다.</span>
+            </h1>
+
+            <p class="text-xs sm:text-base theme-text-muted leading-relaxed font-normal break-keep px-2">
+                글을 쓸 에너지가 없는 지친 날에도 괜찮아요.<br class="hidden sm:inline"/>
+                단 1초의 부드러운 탭으로 지금 내 몸과 마음의 신호를 있는 그대로 마주하세요.
+            </p>
+
+            <!-- CTA 버튼 그룹 (모바일 세로 배치 지원) -->
+            <div class="pt-1 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 w-full max-w-sm sm:max-w-none mx-auto">
+                <a href="#quick-record" class="btn theme-primary-bg border-none w-full sm:w-auto h-11 sm:h-12 min-h-0 rounded-xl sm:rounded-2xl px-5 sm:px-6 gap-2 text-xs sm:text-sm shadow-md shadow-black/5 hover:scale-[1.02] transition-transform font-semibold">
+                    <i data-lucide="heart" class="w-4 h-4"></i>
+                    <span>지금 1초 감정 체크하기</span>
+                </a>
+                <a href="#philosophy" class="btn btn-ghost theme-card theme-text-main border theme-border w-full sm:w-auto h-11 sm:h-12 min-h-0 rounded-xl sm:rounded-2xl px-5 text-xs sm:text-sm hover:opacity-80">
+                    <span>AmorFati 철학</span>
+                    <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- [INTERACTIVE WIDGET] 1초 감정 체크 메인 카드 (모바일 풀 너비 최적화) -->
+        <section id="quick-record" class="scroll-mt-6 sm:scroll-mt-10">
+            <div class="card w-full max-w-xl mx-auto theme-card border theme-border shadow-xl rounded-2xl sm:rounded-3xl p-4 sm:p-7 md:p-8 space-y-5 sm:space-y-7 transition-all">
+                
+                <!-- 카드 헤더 -->
+                <div class="flex items-center justify-between border-b theme-border pb-3 sm:pb-4">
+                    <div class="space-y-0.5">
+                        <h2 class="text-base sm:text-lg font-bold theme-text-main flex items-center gap-1.5 sm:gap-2">
+                            <i data-lucide="sparkles" class="w-4 h-4 theme-primary-text"></i>
+                            <span>지금 내 상태 체크</span>
+                        </h2>
+                        <p class="text-[11px] sm:text-xs theme-text-muted">평가하지 않고, 느껴지는 그대로 담아냅니다.</p>
+                    </div>
+                    <span class="text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full theme-sub theme-primary-text font-bold border theme-border">1-Tap Quick</span>
+                </div>
+
+                <!-- 1. 감정 5단계 선택 바 (모바일 반응형 터치 버튼) -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-semibold theme-text-main">1. 현재 감정 수준</span>
+                        <span class="font-bold theme-primary-text text-[11px] sm:text-xs" x-text="getLevelName(selectedLevel)"></span>
+                    </div>
+
+                    <div class="grid grid-cols-5 gap-1 sm:gap-2 p-1 sm:p-1.5 theme-sub rounded-xl sm:rounded-2xl border theme-border">
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                                :class="selectedLevel === 1 ? 'bg-[#6D6574] text-white border-[#8B8094] shadow-md ring-2 ring-[#8B8094]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
+                                @click="selectedLevel = 1">
+                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">1</span>
+                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">몹시 지침</span>
+                        </button>
+
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                                :class="selectedLevel === 2 ? 'bg-[#5F7184] text-white border-[#8094AA] shadow-md ring-2 ring-[#8094AA]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
+                                @click="selectedLevel = 2">
+                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">2</span>
+                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">불안/답답</span>
+                        </button>
+
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                                :class="selectedLevel === 3 ? 'bg-[#597A6B] text-white border-[#7A9E8E] shadow-md ring-2 ring-[#7A9E8E]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
+                                @click="selectedLevel = 3">
+                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">3</span>
+                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">담담/잔잔</span>
+                        </button>
+
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                                :class="selectedLevel === 4 ? 'bg-[#8F6A55] text-white border-[#B58B74] shadow-md ring-2 ring-[#B58B74]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
+                                @click="selectedLevel = 4">
+                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">4</span>
+                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">편안함</span>
+                        </button>
+
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                                :class="selectedLevel === 5 ? 'bg-[#9E7D44] text-white border-[#C7A362] shadow-md ring-2 ring-[#C7A362]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
+                                @click="selectedLevel = 5">
+                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">5</span>
+                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">가벼움</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. 신체 반응 태그 (Somatic) -->
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold theme-text-main flex items-center gap-1.5">
+                        <i data-lucide="activity" class="w-3.5 h-3.5 theme-primary-text"></i>
+                        <span>2. 몸에서 느껴지는 신호 (선택)</span>
+                    </label>
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                        <template x-for="tag in bodyTags" :key="tag">
+                            <button type="button"
+                                    class="badge badge-sm sm:badge-lg py-2.5 px-3 sm:py-3 sm:px-3.5 rounded-full cursor-pointer select-none transition-all text-[11px] sm:text-xs border min-h-0"
+                                    :class="selectedTags.includes(tag) ? 'theme-primary-bg font-bold shadow-sm' : 'theme-card border-theme-border theme-text-main hover:bg-white/80'"
+                                    @click="toggleTag(tag)"
+                                    x-text="tag"></button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 3. 상황 및 환경 태그 (Trigger) -->
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold theme-text-main flex items-center gap-1.5">
+                        <i data-lucide="compass" class="w-3.5 h-3.5 theme-primary-text"></i>
+                        <span>3. 현재 상황 및 자극 요인 (선택)</span>
+                    </label>
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                        <template x-for="tag in triggerTags" :key="tag">
+                            <button type="button"
+                                    class="badge badge-sm sm:badge-lg py-2.5 px-3 sm:py-3 sm:px-3.5 rounded-full cursor-pointer select-none transition-all text-[11px] sm:text-xs border min-h-0"
+                                    :class="selectedTags.includes(tag) ? 'theme-primary-bg font-bold shadow-sm' : 'theme-card border-theme-border theme-text-main hover:bg-white/80'"
+                                    @click="toggleTag(tag)"
+                                    x-text="tag"></button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 4. 마이크로 메모 -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-semibold theme-text-main flex items-center justify-between">
+                        <span class="flex items-center gap-1.5">
+                            <i data-lucide="message-square" class="w-3.5 h-3.5 theme-primary-text"></i>
+                            <span>4. 짧은 한 줄 생각 (선택)</span>
+                        </span>
+                        <span class="hidden sm:inline text-[11px] theme-text-muted">Ctrl + Enter로 저장</span>
+                    </label>
+                    <textarea class="textarea w-full theme-sub rounded-xl sm:rounded-2xl focus:outline-none text-xs sm:text-sm p-3 sm:p-3.5 resize-none leading-relaxed border theme-border theme-text-main"
+                              rows="2"
+                              x-model="memo"
+                              @keydown.ctrl.enter="saveEmotion()"
+                              @keydown.meta.enter="saveEmotion()"
+                              placeholder="하고 싶은 말이 떠오를 때만 적어도 괜찮아요."></textarea>
+                </div>
+
+                <!-- 5. 내려놓기 저장 버튼 -->
+                <div class="pt-1">
+                    <button type="button"
+                            class="btn theme-primary-bg w-full rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold shadow-md shadow-black/5 gap-2 h-11 sm:h-12 min-h-0 hover:scale-[1.01] transition-transform border-none"
+                            @click="saveEmotion()"
+                            :disabled="isSubmitting">
+                        <i data-lucide="check" class="w-4 h-4" x-show="!isSubmitting"></i>
+                        <span x-show="!isSubmitting">마음 내려놓기 (저장)</span>
+                        <span class="loading loading-spinner loading-sm" x-show="isSubmitting"></span>
+                    </button>
+                </div>
+
+                <!-- 저장 완료 알림 토스트 (잔잔한 피드백) -->
+                <div x-show="showToast"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform translate-y-2"
+                     x-transition:enter-end="opacity-100 transform translate-y-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 transform translate-y-0"
+                     x-transition:leave-end="opacity-0 transform translate-y-2"
+                     class="alert theme-card border theme-border rounded-xl sm:rounded-2xl py-2.5 sm:py-3 px-3.5 sm:px-4 shadow-xl flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-xs theme-text-main font-medium">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                        <span>오늘의 마음이 고요히 남겨졌습니다 🌿</span>
+                    </div>
+                    <button class="btn btn-ghost btn-xs btn-circle theme-text-muted" @click="showToast = false">✕</button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- [TIMELINE SECTION] 오늘의 잔잔한 궤적 (모바일 최적화) -->
+        <section class="max-w-xl mx-auto space-y-3 sm:space-y-4">
+            <div class="flex items-center justify-between px-1">
+                <h3 class="text-xs sm:text-sm font-bold theme-text-main flex items-center gap-1.5 sm:gap-2">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4 theme-primary-text"></i>
+                    <span>오늘 남긴 궤적</span>
+                </h3>
+                <span class="text-[11px] sm:text-xs theme-text-muted font-medium" x-text="records.length + '개의 순간'"></span>
+            </div>
+
+            <!-- 타임라인 피드 리스트 -->
+            <div class="space-y-2.5 sm:space-y-3">
+                <template x-for="(item, index) in records" :key="index">
+                    <div class="p-3.5 sm:p-4 theme-card border theme-border rounded-xl sm:rounded-2xl space-y-1.5 sm:space-y-2 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full inline-block flex-shrink-0" :class="item.dotClass"></span>
+                                <span class="text-xs font-bold theme-text-main" x-text="item.levelTitle"></span>
+                                <span class="text-[10px] sm:text-[11px] theme-text-muted" x-text="item.time"></span>
+                            </div>
+                            <button class="btn btn-ghost btn-xs btn-circle theme-text-muted hover:text-error h-6 w-6 min-h-0"
+                                    @click="deleteRecord(index)">
+                                <i data-lucide="trash-2" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- 태그 뱃지들 -->
+                        <div class="flex flex-wrap gap-1" x-show="item.tags.length > 0">
+                            <template x-for="t in item.tags" :key="t">
+                                <span class="badge badge-xs sm:badge-sm theme-sub text-[10px] sm:text-[11px] px-2 py-0.5 border theme-border theme-text-main" x-text="t"></span>
+                            </template>
+                        </div>
+
+                        <!-- 메모 (긴 텍스트 줄바꿈 방지) -->
+                        <p class="text-xs theme-text-main leading-relaxed break-words break-all" x-show="item.memo" x-text="item.memo"></p>
+                    </div>
+                </template>
+
+                <div x-show="records.length === 0" class="text-center py-8 sm:py-10 theme-card rounded-xl sm:rounded-2xl border border-dashed theme-border text-xs theme-text-muted">
+                    아직 오늘의 기록이 없습니다. 편안할 때 첫 마음을 남겨보세요.
+                </div>
+            </div>
+        </section>
+
+        <!-- [PHILOSOPHY SECTION] AmorFati 3대 핵심 가치 -->
+        <section id="philosophy" class="scroll-mt-6 sm:scroll-mt-10 pt-6 sm:pt-8 border-t theme-border space-y-6 sm:space-y-8">
+            <div class="text-center space-y-1.5 sm:space-y-2">
+                <span class="text-[10px] sm:text-xs font-bold tracking-wider uppercase theme-primary-text">Core Values</span>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight theme-text-main break-keep">
+                    AmorFati가 지키는 3가지 약속
+                </h2>
+                <p class="text-xs sm:text-sm theme-text-muted break-keep">
+                    우리는 당신을 채점하거나 평가하지 않습니다.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-6">
+                <!-- 가치 1 -->
+                <div class="p-4 sm:p-6 theme-card border theme-border rounded-2xl sm:rounded-3xl space-y-2.5 sm:space-y-3 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl theme-sub border theme-border flex items-center justify-center theme-primary-text shadow-sm">
+                        <i data-lucide="zap-off" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-bold theme-text-main">인지 부하 제로</h3>
+                    <p class="text-xs theme-text-muted leading-relaxed font-normal break-keep">
+                        뇌가 방전되고 지친 날에도 글자 하나 쓰지 않고 1초 만에 감정을 남길 수 있는 초단순 인터페이스를 제공합니다.
+                    </p>
+                </div>
+
+                <!-- 가치 2 -->
+                <div class="p-4 sm:p-6 theme-card border theme-border rounded-2xl sm:rounded-3xl space-y-2.5 sm:space-y-3 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl theme-sub border theme-border flex items-center justify-center text-emerald-600 shadow-sm">
+                        <i data-lucide="heart-pulse" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-bold theme-text-main">신체와 마음의 연결</h3>
+                    <p class="text-xs theme-text-muted leading-relaxed font-normal break-keep">
+                        내 감정을 언어로 정의하기 힘들 땐 호흡, 어깨 긴장, 두통 같은 신체 감각과 주변 자극을 통해 자연스럽게 알아차립니다.
+                    </p>
+                </div>
+
+                <!-- 가치 3 -->
+                <div class="p-4 sm:p-6 theme-card border theme-border rounded-2xl sm:rounded-3xl space-y-2.5 sm:space-y-3 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 rounded-xl sm:rounded-2xl theme-sub border theme-border flex items-center justify-center text-amber-600 shadow-sm">
+                        <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-bold theme-text-main">평가 없는 안전지대</h3>
+                    <p class="text-xs theme-text-muted leading-relaxed font-normal break-keep">
+                        연속 기록(Streak) 실패로 자책감을 주지 않습니다. 며칠을 건너뛰고 돌아와도 언제나 온화하게 반겨줍니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 3. 푸터 (모바일 break-keep 적용) -->
+    <footer class="w-full border-t theme-border py-8 sm:py-10 px-4 sm:px-6 text-center space-y-2.5 text-xs theme-text-muted break-keep">
+        <p class="italic">"네 운명을 사랑하라(Amor Fati) — 흔들리고 아팠던 순간까지 모두 온전한 나의 일부입니다."</p>
+        <p class="text-[11px]">© 2026 AmorFati. colorize gallery All rights reserved.</p>
+    </footer>
+
+    <!-- 4. AmorFati 프론트엔드 스크립트 -->
+    <script th:src="@{/js/app.js}" src="/js/app.js"></script>
+</body>
+</html>
