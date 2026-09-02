@@ -91,4 +91,5 @@ graph TD
 
 - [1차 MVP 제품 요구사항 정의서 (PRD - Emotion Tracking)](docs/PRD-01-emotion-recording.md)
 - [시스템 아키텍처 및 백엔드 개발 표준 (Architecture Standards)](docs/01-architecture-standards.md)
+- [데이터베이스 설계 및 ERD 명세서 (Database Design)](docs/02-database-design.md)
 - [UI 디자인 시스템 및 컴포넌트 가이드 (UI Design Guide)](docs/03-ui-design-guide.md)

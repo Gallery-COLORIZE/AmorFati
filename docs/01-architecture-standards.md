@@ -36,32 +36,43 @@ com.colorize.amorfati
 │   │   │   └── EmotionResponse.java  # Detail, TimelineItem
 │   │   ├── entity/              # JPA 엔티티 및 Enum
 │   │   │   ├── EmotionLog.java
-│   │   │   ├── EmotionLogTag.java
+│   │   │   ├── EmotionLogSomatic.java
+│   │   │   ├── EmotionLogTrigger.java
 │   │   │   └── EmotionLevel.java
 │   │   ├── repository/          # Spring Data JPA Repository
 │   │   │   ├── EmotionLogRepository.java
-│   │   │   └── EmotionLogTagRepository.java
+│   │   │   ├── EmotionLogSomaticRepository.java
+│   │   │   └── EmotionLogTriggerRepository.java
 │   │   └── service/             # 비즈니스 로직
 │   │       └── EmotionService.java
 │   │
-│   ├── tag/                     # 신체 감각 & 트리거 태그 도메인
+│   ├── somatic/                 # 신체 반응 신호 도메인 (9종 프리셋)
 │   │   ├── controller/
-│   │   │   └── TagApiController.java
+│   │   │   └── SomaticSignalApiController.java
 │   │   ├── dto/
-│   │   │   ├── TagRequest.java       # Create
-│   │   │   └── TagResponse.java      # Simple, Detail
+│   │   │   └── SomaticSignalResponse.java
 │   │   ├── entity/
-│   │   │   ├── Tag.java
-│   │   │   └── TagCategory.java (BODY_RESPONSE, TRIGGER)
+│   │   │   └── SomaticSignal.java
 │   │   ├── repository/
-│   │   │   └── TagRepository.java
+│   │   │   └── SomaticSignalRepository.java
 │   │   └── service/
-│   │       └── TagService.java
+│   │       └── SomaticSignalService.java
+│   │
+│   ├── trigger/                 # 상황 및 트리거 도메인 (8종 프리셋)
+│   │   ├── controller/
+│   │   │   └── TriggerFactorApiController.java
+│   │   ├── dto/
+│   │   │   └── TriggerFactorResponse.java
+│   │   ├── entity/
+│   │   │   └── TriggerFactor.java
+│   │   ├── repository/
+│   │   │   └── TriggerFactorRepository.java
+│   │   └── service/
+│   │       └── TriggerFactorService.java
 │   │
 │   └── member/                  # 사용자 계정 도메인
 │       ├── entity/
-│       │   ├── Member.java
-│       │   └── Role.java
+│       │   └── Member.java
 │       ├── repository/
 │       │   └── MemberRepository.java
 │       └── service/
@@ -137,7 +148,8 @@ public class EmotionRequest {
             @Max(value = 5, message = "감정 레벨은 5 이하여야 합니다.")
             Integer level,
 
-            List<Long> tagIds,
+            List<Long> somaticSignalIds,
+            List<Long> triggerFactorIds,
 
             @Size(max = 1000, message = "메모는 최대 1000자까지 작성할 수 있습니다.")
             String memo,
@@ -146,7 +158,8 @@ public class EmotionRequest {
     ) {
         // Compact Constructor: null 방어 및 기본값 세팅
         public Create {
-            tagIds = (tagIds == null) ? List.of() : List.copyOf(tagIds);
+            somaticSignalIds = (somaticSignalIds == null) ? List.of() : List.copyOf(somaticSignalIds);
+            triggerFactorIds = (triggerFactorIds == null) ? List.of() : List.copyOf(triggerFactorIds);
             recordedAt = (recordedAt == null) ? LocalDateTime.now() : recordedAt;
         }
 
@@ -164,12 +177,14 @@ public class EmotionRequest {
     public record Update(
             @Min(1) @Max(5)
             Integer level,
-            List<Long> tagIds,
+            List<Long> somaticSignalIds,
+            List<Long> triggerFactorIds,
             @Size(max = 1000)
             String memo
     ) {
         public Update {
-            tagIds = (tagIds == null) ? List.of() : List.copyOf(tagIds);
+            somaticSignalIds = (somaticSignalIds == null) ? List.of() : List.copyOf(somaticSignalIds);
+            triggerFactorIds = (triggerFactorIds == null) ? List.of() : List.copyOf(triggerFactorIds);
         }
     }
 }
@@ -184,7 +199,8 @@ package com.colorize.amorfati.domain.emotion.dto;
 
 import com.colorize.amorfati.domain.emotion.entity.EmotionLevel;
 import com.colorize.amorfati.domain.emotion.entity.EmotionLog;
-import com.colorize.amorfati.domain.tag.dto.TagResponse;
+import com.colorize.amorfati.domain.somatic.dto.SomaticSignalResponse;
+import com.colorize.amorfati.domain.trigger.dto.TriggerFactorResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -199,17 +215,21 @@ public class EmotionResponse {
             EmotionLevel level,
             int levelScore,
             String memo,
-            List<TagResponse.Simple> tags,
+            List<SomaticSignalResponse> somaticSignals,
+            List<TriggerFactorResponse> triggerFactors,
             LocalDateTime recordedAt,
             LocalDateTime createdAt
     ) {
-        public static Detail from(EmotionLog log, List<TagResponse.Simple> tags) {
+        public static Detail from(EmotionLog log, 
+                                  List<SomaticSignalResponse> somaticSignals, 
+                                  List<TriggerFactorResponse> triggerFactors) {
             return new Detail(
                     log.getId(),
                     log.getEmotionLevel(),
                     log.getEmotionLevel().getScore(),
                     log.getMemo(),
-                    tags,
+                    somaticSignals,
+                    triggerFactors,
                     log.getRecordedAt(),
                     log.getCreatedAt()
             );
@@ -221,7 +241,8 @@ public class EmotionResponse {
             Long id,
             int levelScore,
             String levelColorHex,
-            List<String> tagNames,
+            List<String> somaticSignalNames,
+            List<String> triggerFactorNames,
             boolean hasMemo,
             LocalDateTime recordedAt
     ) {
@@ -230,12 +251,14 @@ public class EmotionResponse {
                     log.getId(),
                     log.getEmotionLevel().getScore(),
                     log.getEmotionLevel().getColorHex(),
-                    log.getTags().stream().map(t -> t.getTag().getName()).toList(),
+                    log.getSomaticSignals().stream().map(s -> s.getSomaticSignal().getName()).toList(),
+                    log.getTriggerFactors().stream().map(t -> t.getTriggerFactor().getName()).toList(),
                     log.getMemo() != null && !log.getMemo().isBlank(),
                     log.getRecordedAt()
             );
         }
     }
+}
 }
 ```
 
@@ -369,9 +392,11 @@ public enum ErrorCode {
     EMOTION_LOG_NOT_FOUND(HttpStatus.NOT_FOUND, "E001", "해당 감정 기록을 찾을 수 없습니다."),
     INVALID_EMOTION_LEVEL(HttpStatus.BAD_REQUEST, "E002", "감정 레벨은 1~5 단계여야 합니다."),
 
-    // Tag (T001 ~ T099)
-    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "해당 태그를 찾을 수 없습니다."),
-    DUPLICATE_TAG_NAME(HttpStatus.CONFLICT, "T002", "이미 존재하는 태그 이름입니다.");
+    // Somatic Signal (S001 ~ S099)
+    SOMATIC_SIGNAL_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 신체 반응 신호를 찾을 수 없습니다."),
+
+    // Trigger Factor (T001 ~ T099)
+    TRIGGER_FACTOR_NOT_FOUND(HttpStatus.NOT_FOUND, "T001", "해당 상황/트리거 요인을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String code;
@@ -424,7 +449,7 @@ public abstract class BaseTimeEntity {
 2. **Setter 사용 금지**: `@Setter` 대신 목적이 명확한 비즈니스 수정 메서드(`updateMemo(...)`, `changeEmotionLevel(...)`)를 선언합니다.
 3. **정적 팩토리 메서드 활용**: 객체 생성 로직을 캡슐화하기 위해 `of(...)` 또는 `create(...)` 팩토리 메서드를 사용합니다.
 4. **모든 연관관계는 지연 로딩(`FetchType.LAZY`)**: N+1 문제를 방지하고 쿼리 실행 흐름을 제어합니다.
-5. **다대다(N:M)는 중간 엔티티로 승격**: `EmotionLog`와 `Tag`는 `EmotionLogTag` 연결 엔티티를 두어 다대일 관계로 풀어냅니다.
+5. **다대다(N:M)는 중간 엔티티로 승격**: `EmotionLog`와 `SomaticSignal`은 `EmotionLogSomatic`, `TriggerFactor`는 `EmotionLogTrigger` 연결 엔티티를 두어 다대일 관계로 명확히 풀어냅니다.
 6. **조회 전용 트랜잭션 분리**: 조회 서비스 메서드에는 `@Transactional(readOnly = true)`를 반드시 명시합니다.
 
 ---
@@ -454,7 +479,7 @@ public ResponseEntity<ApiResponse<EmotionResponse.Detail>> recordEmotion(
 | 분류 | 위치 | 패키지 | 담당 역할 |
 | :--- | :--- | :--- | :--- |
 | **View Controller** | `@Controller` | `com.colorize.amorfati.web` | Thymeleaf HTML 페이지 렌더링, 초기 화면 구성 데이터 모델 바인딩 |
-| **API Controller** | `@RestController` | `com.colorize.amorfati.domain.*.controller` | 비동기 1초 감정 저장, 태그 추가/삭제, 타임라인 무한 스크롤 / 월별 필터링 데이터 제공 |
+| **API Controller** | `@RestController` | `com.colorize.amorfati.domain.*.controller` | 비동기 1초 감정 저장, 신체/트리거 프리셋 조회, 타임라인 무한 스크롤 / 월별 필터링 데이터 제공 |
 
 ---
 
@@ -463,5 +488,5 @@ public ResponseEntity<ApiResponse<EmotionResponse.Detail>> recordEmotion(
 - [ ] `global/common` 패키지 생성 및 `ApiResponse`, `BaseTimeEntity` 작성
 - [ ] `global/error` 패키지 생성 및 `ErrorCode`, `GlobalExceptionHandler`, `BusinessException` 작성
 - [ ] `global/config`에 `JpaAuditingConfig`, `SecurityConfig` 설정
-- [ ] `domain/member`, `domain/tag`, `domain/emotion` 순서로 엔티티 및 Repository 구현
-- [ ] `EmotionRequest`, `EmotionResponse`, `TagRequest`, `TagResponse` 작성
+- [ ] `domain/member`, `domain/somatic`, `domain/trigger`, `domain/emotion` 순서로 엔티티 및 Repository 구현
+- [ ] `EmotionRequest`, `EmotionResponse`, `SomaticSignalResponse`, `TriggerFactorResponse` 작성
