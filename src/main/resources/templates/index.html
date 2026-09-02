@@ -132,7 +132,7 @@
                     <span class="text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full theme-sub theme-primary-text font-bold border theme-border">1-Tap Quick</span>
                 </div>
 
-                <!-- 1. 감정 5단계 선택 바 (모바일 반응형 터치 버튼) -->
+                <!-- 1. 감정 5단계 선택 바 (아이콘 포함 모바일 반응형 터치 버튼) -->
                 <div class="space-y-2">
                     <div class="flex items-center justify-between text-xs">
                         <span class="font-semibold theme-text-main">1. 현재 감정 수준</span>
@@ -140,73 +140,97 @@
                     </div>
 
                     <div class="grid grid-cols-5 gap-1 sm:gap-2 p-1 sm:p-1.5 theme-sub rounded-xl sm:rounded-2xl border theme-border">
-                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                        <!-- 레벨 1 -->
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0 gap-0.5"
                                 :class="selectedLevel === 1 ? 'bg-[#6D6574] text-white border-[#8B8094] shadow-md ring-2 ring-[#8B8094]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
                                 @click="selectedLevel = 1">
-                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">1</span>
-                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">몹시 지침</span>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="cloud-rain" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span class="text-xs sm:text-sm font-bold leading-none">1</span>
+                            </div>
+                            <span class="text-[9px] sm:text-[11px] leading-tight truncate">몹시 지침</span>
                         </button>
 
-                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                        <!-- 레벨 2 -->
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0 gap-0.5"
                                 :class="selectedLevel === 2 ? 'bg-[#5F7184] text-white border-[#8094AA] shadow-md ring-2 ring-[#8094AA]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
                                 @click="selectedLevel = 2">
-                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">2</span>
-                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">불안/답답</span>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="wind" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span class="text-xs sm:text-sm font-bold leading-none">2</span>
+                            </div>
+                            <span class="text-[9px] sm:text-[11px] leading-tight truncate">불안/답답</span>
                         </button>
 
-                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                        <!-- 레벨 3 -->
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0 gap-0.5"
                                 :class="selectedLevel === 3 ? 'bg-[#597A6B] text-white border-[#7A9E8E] shadow-md ring-2 ring-[#7A9E8E]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
                                 @click="selectedLevel = 3">
-                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">3</span>
-                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">담담/잔잔</span>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="leaf" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span class="text-xs sm:text-sm font-bold leading-none">3</span>
+                            </div>
+                            <span class="text-[9px] sm:text-[11px] leading-tight truncate">담담/잔잔</span>
                         </button>
 
-                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                        <!-- 레벨 4 -->
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0 gap-0.5"
                                 :class="selectedLevel === 4 ? 'bg-[#8F6A55] text-white border-[#B58B74] shadow-md ring-2 ring-[#B58B74]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
                                 @click="selectedLevel = 4">
-                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">4</span>
-                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">편안함</span>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="heart" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span class="text-xs sm:text-sm font-bold leading-none">4</span>
+                            </div>
+                            <span class="text-[9px] sm:text-[11px] leading-tight truncate">편안함</span>
                         </button>
 
-                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0"
+                        <!-- 레벨 5 -->
+                        <button type="button" class="btn btn-sm flex flex-col items-center justify-center h-14 sm:h-16 md:h-18 p-0.5 sm:p-1 rounded-lg sm:rounded-xl transition-all duration-200 border min-h-0 gap-0.5"
                                 :class="selectedLevel === 5 ? 'bg-[#9E7D44] text-white border-[#C7A362] shadow-md ring-2 ring-[#C7A362]/50' : 'btn-ghost theme-text-main border-transparent hover:bg-white/60'"
                                 @click="selectedLevel = 5">
-                            <span class="text-sm sm:text-base md:text-lg font-bold leading-none">5</span>
-                            <span class="text-[9px] sm:text-[11px] leading-tight mt-0.5 truncate">가벼움</span>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                                <span class="text-xs sm:text-sm font-bold leading-none">5</span>
+                            </div>
+                            <span class="text-[9px] sm:text-[11px] leading-tight truncate">가벼움</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- 2. 신체 반응 태그 (Somatic) -->
+                <!-- 2. 신체 반응 신호 (Somatic Signals - 9종 프리셋) -->
                 <div class="space-y-2">
                     <label class="text-xs font-semibold theme-text-main flex items-center gap-1.5">
                         <i data-lucide="activity" class="w-3.5 h-3.5 theme-primary-text"></i>
                         <span>2. 몸에서 느껴지는 신호 (선택)</span>
                     </label>
                     <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                        <template x-for="tag in bodyTags" :key="tag">
+                        <template x-for="signal in somaticSignals" :key="signal.id">
                             <button type="button"
-                                    class="badge badge-sm sm:badge-lg py-2.5 px-3 sm:py-3 sm:px-3.5 rounded-full cursor-pointer select-none transition-all text-[11px] sm:text-xs border min-h-0"
-                                    :class="selectedTags.includes(tag) ? 'theme-primary-bg font-bold shadow-sm' : 'theme-card border-theme-border theme-text-main hover:bg-white/80'"
-                                    @click="toggleTag(tag)"
-                                    x-text="tag"></button>
+                                    class="badge badge-sm sm:badge-lg py-2.5 px-3 sm:py-3 sm:px-3.5 rounded-full cursor-pointer select-none transition-all text-[11px] sm:text-xs border min-h-0 inline-flex items-center gap-1.5"
+                                    :class="selectedSomaticIds.includes(signal.id) ? 'theme-primary-bg font-bold shadow-sm' : 'theme-card border-theme-border theme-text-main hover:bg-white/80'"
+                                    @click="toggleSomatic(signal.id)">
+                                <i :data-lucide="signal.icon" class="w-3.5 h-3.5"></i>
+                                <span x-text="signal.name"></span>
+                            </button>
                         </template>
                     </div>
                 </div>
 
-                <!-- 3. 상황 및 환경 태그 (Trigger) -->
+                <!-- 3. 상황 및 자극 요인 (Trigger Factors - 8종 프리셋) -->
                 <div class="space-y-2">
                     <label class="text-xs font-semibold theme-text-main flex items-center gap-1.5">
                         <i data-lucide="compass" class="w-3.5 h-3.5 theme-primary-text"></i>
                         <span>3. 현재 상황 및 자극 요인 (선택)</span>
                     </label>
                     <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                        <template x-for="tag in triggerTags" :key="tag">
+                        <template x-for="factor in triggerFactors" :key="factor.id">
                             <button type="button"
-                                    class="badge badge-sm sm:badge-lg py-2.5 px-3 sm:py-3 sm:px-3.5 rounded-full cursor-pointer select-none transition-all text-[11px] sm:text-xs border min-h-0"
-                                    :class="selectedTags.includes(tag) ? 'theme-primary-bg font-bold shadow-sm' : 'theme-card border-theme-border theme-text-main hover:bg-white/80'"
-                                    @click="toggleTag(tag)"
-                                    x-text="tag"></button>
+                                    class="badge badge-sm sm:badge-lg py-2.5 px-3 sm:py-3 sm:px-3.5 rounded-full cursor-pointer select-none transition-all text-[11px] sm:text-xs border min-h-0 inline-flex items-center gap-1.5"
+                                    :class="selectedTriggerIds.includes(factor.id) ? 'theme-primary-bg font-bold shadow-sm' : 'theme-card border-theme-border theme-text-main hover:bg-white/80'"
+                                    @click="toggleTrigger(factor.id)">
+                                <i :data-lucide="factor.icon" class="w-3.5 h-3.5"></i>
+                                <span x-text="factor.name"></span>
+                            </button>
                         </template>
                     </div>
                 </div>
@@ -285,10 +309,21 @@
                             </button>
                         </div>
 
-                        <!-- 태그 뱃지들 -->
-                        <div class="flex flex-wrap gap-1" x-show="item.tags.length > 0">
-                            <template x-for="t in item.tags" :key="t">
-                                <span class="badge badge-xs sm:badge-sm theme-sub text-[10px] sm:text-[11px] px-2 py-0.5 border theme-border theme-text-main" x-text="t"></span>
+                        <!-- 신체 반응 및 트리거 뱃지들 -->
+                        <div class="flex flex-wrap gap-1.5" x-show="(item.somaticSignals && item.somaticSignals.length > 0) || (item.triggerFactors && item.triggerFactors.length > 0)">
+                            <!-- 신체 반응 뱃지 -->
+                            <template x-for="s in item.somaticSignals" :key="s.name">
+                                <span class="badge badge-xs sm:badge-sm theme-sub text-[10px] sm:text-[11px] px-2 py-0.5 border theme-border theme-text-main inline-flex items-center gap-1">
+                                    <i :data-lucide="s.icon" class="w-3 h-3 text-emerald-600"></i>
+                                    <span x-text="s.name"></span>
+                                </span>
+                            </template>
+                            <!-- 트리거 요인 뱃지 -->
+                            <template x-for="t in item.triggerFactors" :key="t.name">
+                                <span class="badge badge-xs sm:badge-sm theme-sub text-[10px] sm:text-[11px] px-2 py-0.5 border theme-border theme-text-main inline-flex items-center gap-1">
+                                    <i :data-lucide="t.icon" class="w-3 h-3 theme-primary-text"></i>
+                                    <span x-text="t.name"></span>
+                                </span>
                             </template>
                         </div>
 
