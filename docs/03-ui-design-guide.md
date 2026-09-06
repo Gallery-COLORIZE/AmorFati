@@ -274,7 +274,7 @@ function emotionApp() {
             };
 
             try {
-                const res = await fetch('/api/v1/emotions', {
+                const res = await fetch('/api/emotions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -296,7 +296,7 @@ function emotionApp() {
         },
 
         async fetchTags() {
-            const res = await fetch('/api/v1/tags');
+            const res = await fetch('/api/tags');
             const result = await res.json();
             if (result.success) {
                 this.bodyTags = result.data.filter(t => t.category === 'BODY_RESPONSE');
@@ -306,7 +306,7 @@ function emotionApp() {
         },
 
         async fetchTodayLogs() {
-            const res = await fetch('/api/v1/emotions/today');
+            const res = await fetch('/api/emotions/today');
             const result = await res.json();
             if (result.success) {
                 this.timelineLogs = result.data;

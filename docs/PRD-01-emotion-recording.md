@@ -105,23 +105,23 @@ flowchart LR
 
 ## 5. REST API 명세 (Draft)
 
-### 감정 기록 관련 API (`/api/v1/emotions`)
+### 감정 기록 관련 API (`/api/emotions`)
 
 | Method | Endpoint | 설명 | Request Body / Params | Response |
 | :---: | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/emotions` | 새로운 감정 기록 생성 | `{ emotionLevel, tagIds: [], memo, recordedAt }` | `201 Created` (생성된 로그 객체) |
-| `GET` | `/api/v1/emotions` | 감정 기록 목록 조회 (페이징/월별) | `?year=2026&month=8&page=0&size=30` | `200 OK` (로그 목록) |
-| `GET` | `/api/v1/emotions/{id}` | 특정 감정 기록 단건 조회 | Path variable `id` | `200 OK` (상세 로그) |
-| `PUT` | `/api/v1/emotions/{id}` | 감정 기록 수정 | `{ emotionLevel, tagIds: [], memo, recordedAt }` | `200 OK` (수정된 로그) |
-| `DELETE` | `/api/v1/emotions/{id}` | 감정 기록 삭제 | Path variable `id` | `204 No Content` |
+| `POST` | `/api/emotions` | 새로운 감정 기록 생성 | `{ emotionLevel, tagIds: [], memo, recordedAt }` | `201 Created` (생성된 로그 객체) |
+| `GET` | `/api/emotions` | 감정 기록 목록 조회 (페이징/월별) | `?year=2026&month=8&page=0&size=30` | `200 OK` (로그 목록) |
+| `GET` | `/api/emotions/{id}` | 특정 감정 기록 단건 조회 | Path variable `id` | `200 OK` (상세 로그) |
+| `PUT` | `/api/emotions/{id}` | 감정 기록 수정 | `{ emotionLevel, tagIds: [], memo, recordedAt }` | `200 OK` (수정된 로그) |
+| `DELETE` | `/api/emotions/{id}` | 감정 기록 삭제 | Path variable `id` | `204 No Content` |
 
-### 태그 관련 API (`/api/v1/tags`)
+### 태그 관련 API (`/api/tags`)
 
 | Method | Endpoint | 설명 | Request Body / Params | Response |
 | :---: | :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/tags` | 사용 가능한 태그 목록 (기본+커스텀) | `?category=BODY_RESPONSE` | `200 OK` (태그 리스트) |
-| `POST` | `/api/v1/tags` | 커스텀 태그 추가 | `{ name, category, icon }` | `201 Created` |
-| `DELETE` | `/api/v1/tags/{id}` | 커스텀 태그 삭제 | Path variable `id` | `204 No Content` |
+| `GET` | `/api/tags` | 사용 가능한 태그 목록 (기본+커스텀) | `?category=BODY_RESPONSE` | `200 OK` (태그 리스트) |
+| `POST` | `/api/tags` | 커스텀 태그 추가 | `{ name, category, icon }` | `201 Created` |
+| `DELETE` | `/api/tags/{id}` | 커스텀 태그 삭제 | Path variable `id` | `204 No Content` |
 
 ---
 

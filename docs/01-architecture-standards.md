@@ -110,7 +110,7 @@ com.colorize.amorfati
 
 ```java
 @RestController
-@RequestMapping("/api/v1/emotions")
+@RequestMapping("/api/emotions")
 @RequiredArgsConstructor
 public class EmotionApiController {
 
