@@ -12,57 +12,19 @@ function heroApp() {
         isSubmitting: false,
         showToast: false,
 
-        // 1. 신체 반응 신호 9종 프리셋 (Somatic Signals)
-        somaticSignals: [
-            { id: 1, name: '가슴 답답함', icon: 'heart-crack' },
-            { id: 2, name: '호흡이 얕음', icon: 'wind' },
-            { id: 3, name: '두통/머리 무거움', icon: 'zap-off' },
-            { id: 4, name: '턱/어깨 긴장', icon: 'activity' },
-            { id: 5, name: '위장 불편감', icon: 'frown' },
-            { id: 6, name: '눈 피로', icon: 'eye-off' },
-            { id: 7, name: '온몸 무기력', icon: 'battery-low' },
-            { id: 8, name: '깊은 이완/호흡 편안', icon: 'smile' },
-            { id: 9, name: '몸이 가벼움', icon: 'feather' }
-        ],
+        // 1. 신체 반응 신호 (DB API 연동)
+        somaticSignals: [],
 
-        // 2. 상황 및 트리거 요인 8종 프리셋 (Trigger Factors)
-        triggerFactors: [
-            { id: 1, name: '대인관계/대화', icon: 'users' },
-            { id: 2, name: '소음/외부 자극', icon: 'volume-2' },
-            { id: 3, name: '업무/과부하', icon: 'briefcase' },
-            { id: 4, name: '수면 부족', icon: 'moon' },
-            { id: 5, name: '혼자만의 시간', icon: 'coffee' },
-            { id: 6, name: '모터사이클/라이딩', icon: 'navigation' },
-            { id: 7, name: '자연/산책', icon: 'trees' },
-            { id: 8, name: '휴식/멍때리기', icon: 'sun' }
-        ],
+        // 2. 상황 및 트리거 요인 (DB API 연동)
+        triggerFactors: [],
 
-        // 데모 초기 타임라인 샘플 데이터
-        records: [
-            {
-                level: 3,
-                levelTitle: '3단계: 담담함/잔잔함',
-                dotClass: 'bg-[#597A6B]',
-                levelIcon: 'leaf',
-                somaticSignals: [{ name: '깊은 이완/호흡 편안', icon: 'smile' }],
-                triggerFactors: [{ name: '혼자만의 시간', icon: 'coffee' }],
-                memo: '오랜만에 조용히 책을 읽고 차를 마셨다.',
-                time: '14:30'
-            },
-            {
-                level: 2,
-                levelTitle: '2단계: 불안함/가라앉음',
-                dotClass: 'bg-[#5F7184]',
-                levelIcon: 'wind',
-                somaticSignals: [{ name: '가슴 답답함', icon: 'heart-crack' }],
-                triggerFactors: [{ name: '소음/외부 자극', icon: 'volume-2' }],
-                memo: '',
-                time: '11:15'
-            }
-        ],
+        // 3. 오늘 남긴 타임라인 기록 (DB API 연동)
+        records: [],
 
-        init() {
+        async init() {
             document.documentElement.setAttribute('data-theme', this.currentTheme);
+            await this.loadPresets();
+            await this.loadTodayRecords();
             this.$nextTick(() => {
                 lucide.createIcons();
             });
@@ -75,6 +37,37 @@ function heroApp() {
             this.$nextTick(() => {
                 lucide.createIcons();
             });
+        },
+
+        // 신체 반응 및 트리거 프리셋 목록 DB 조회
+        async loadPresets() {
+            try {
+                const [somaticRes, triggerRes] = await Promise.all([
+                    fetch('/api/somatic-signals').then(r => r.json()),
+                    fetch('/api/trigger-factors').then(r => r.json())
+                ]);
+
+                if (somaticRes.success && somaticRes.data) {
+                    this.somaticSignals = somaticRes.data;
+                }
+                if (triggerRes.success && triggerRes.data) {
+                    this.triggerFactors = triggerRes.data;
+                }
+            } catch (error) {
+                console.error('프리셋 데이터를 불러오지 못했습니다:', error);
+            }
+        },
+
+        // 오늘의 감정 궤적 목록 DB 조회
+        async loadTodayRecords() {
+            try {
+                const res = await fetch('/api/emotions/today').then(r => r.json());
+                if (res.success && res.data) {
+                    this.records = res.data;
+                }
+            } catch (error) {
+                console.error('오늘의 기록을 불러오지 못했습니다:', error);
+            }
         },
 
         toggleSomatic(id) {
@@ -104,67 +97,59 @@ function heroApp() {
             return names[level] || '';
         },
 
-        getLevelDotClass(level) {
-            const dots = {
-                1: 'bg-[#6D6574]',
-                2: 'bg-[#5F7184]',
-                3: 'bg-[#597A6B]',
-                4: 'bg-[#8F6A55]',
-                5: 'bg-[#9E7D44]'
-            };
-            return dots[level] || 'theme-primary-bg';
-        },
-
-        getLevelIcon(level) {
-            const icons = {
-                1: 'cloud-rain',
-                2: 'wind',
-                3: 'leaf',
-                4: 'heart',
-                5: 'sparkles'
-            };
-            return icons[level] || 'sparkles';
-        },
-
-        saveEmotion() {
+        // 1초 감정 기록 저장 (POST /api/emotions)
+        async saveEmotion() {
             if (this.isSubmitting) return;
             this.isSubmitting = true;
 
-            setTimeout(() => {
-                const now = new Date();
-                const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            const payload = {
+                level: this.selectedLevel,
+                somaticSignalIds: this.selectedSomaticIds,
+                triggerFactorIds: this.selectedTriggerIds,
+                memo: this.memo.trim() ? this.memo.trim() : null
+            };
 
-                const chosenSomatic = this.somaticSignals.filter(s => this.selectedSomaticIds.includes(s.id));
-                const chosenTrigger = this.triggerFactors.filter(t => this.selectedTriggerIds.includes(t.id));
-
-                this.records.unshift({
-                    level: this.selectedLevel,
-                    levelTitle: this.getLevelName(this.selectedLevel),
-                    dotClass: this.getLevelDotClass(this.selectedLevel),
-                    levelIcon: this.getLevelIcon(this.selectedLevel),
-                    somaticSignals: chosenSomatic,
-                    triggerFactors: chosenTrigger,
-                    memo: this.memo.trim(),
-                    time: timeStr
+            try {
+                const response = await fetch('/api/emotions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
+                const result = await response.json();
 
-                this.memo = '';
-                this.selectedSomaticIds = [];
-                this.selectedTriggerIds = [];
+                if (result.success && result.data) {
+                    this.records.unshift(result.data);
+                    this.memo = '';
+                    this.selectedSomaticIds = [];
+                    this.selectedTriggerIds = [];
+                    this.showToast = true;
+
+                    this.$nextTick(() => {
+                        lucide.createIcons();
+                    });
+
+                    setTimeout(() => {
+                        this.showToast = false;
+                    }, 3500);
+                } else {
+                    console.error('기록 저장 실패:', result.message);
+                }
+            } catch (error) {
+                console.error('서버 통신 오류:', error);
+            } finally {
                 this.isSubmitting = false;
-                this.showToast = true;
-
-                this.$nextTick(() => {
-                    lucide.createIcons();
-                });
-
-                setTimeout(() => {
-                    this.showToast = false;
-                }, 3500);
-            }, 250);
+            }
         },
 
-        deleteRecord(index) {
+        // 감정 기록 삭제 (DELETE /api/emotions/{id})
+        async deleteRecord(index, id) {
+            if (id) {
+                try {
+                    await fetch('/api/emotions/' + id, { method: 'DELETE' });
+                } catch (error) {
+                    console.error('기록 삭제 실패:', error);
+                }
+            }
             this.records.splice(index, 1);
             this.$nextTick(() => {
                 lucide.createIcons();
