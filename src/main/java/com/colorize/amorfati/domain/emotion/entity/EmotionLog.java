@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,9 +41,11 @@ public class EmotionLog extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime recordedAt;
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "emotionLog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmotionLogSomatic> somaticSignals = new ArrayList<>();
 
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "emotionLog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmotionLogTrigger> triggerFactors = new ArrayList<>();
 
